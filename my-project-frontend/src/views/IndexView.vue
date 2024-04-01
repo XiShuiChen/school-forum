@@ -4,7 +4,6 @@ import router from "@/router";
 import {useStore} from "@/store";
 import {reactive, ref} from "vue";
 import {
-  Back,
   Calendar,
   ChatDotSquare, Collection, DataLine,
   Document,
