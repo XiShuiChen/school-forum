@@ -166,7 +166,7 @@ const validateEmail = () => {
         clearInterval(handle)
       }
     }, 1000)
-  }, undefined, (message) => {
+  }, (message) => {
     ElMessage.warning(message)
     coldTime.value = 0
   })

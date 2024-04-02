@@ -16,7 +16,7 @@ public class DetailsSaveVo {
     @Max(1)
     int gender;
 
-    @Pattern(regexp = "^1[3-9]\\d{9}$")
+    @Pattern(regexp = "^\\d+$")
     @Length(max = 11)
     String phone;
 
