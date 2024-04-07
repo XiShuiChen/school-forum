@@ -3,12 +3,16 @@ package com.example.controller;
 import com.example.entity.RestBean;
 import com.example.entity.dto.Account;
 import com.example.entity.dto.AccountDetails;
+import com.example.entity.dto.AccountPrivacy;
 import com.example.entity.vo.request.ChangePasswordVO;
 import com.example.entity.vo.request.DetailsSaveVo;
 import com.example.entity.vo.request.ModifyEmailVO;
+import com.example.entity.vo.request.PrivacySaveVo;
 import com.example.entity.vo.response.AccountDetailsVO;
+import com.example.entity.vo.response.AccountPrivacyVO;
 import com.example.entity.vo.response.AccountVO;
 import com.example.service.AccountDetailsService;
+import com.example.service.AccountPrivacyService;
 import com.example.service.AccountService;
 import com.example.utils.Const;
 import jakarta.annotation.Resource;
@@ -28,14 +32,17 @@ public class AccountController {
     @Resource
     AccountDetailsService detailsService;
 
+    @Resource
+    AccountPrivacyService privacyService;
+
     @GetMapping("/info")
-    public RestBean<AccountVO> info(@RequestAttribute(Const.ATTR_USER_ID) int id){
+    public RestBean<AccountVO> info(@RequestAttribute(Const.ATTR_USER_ID) int id) {
         Account account = service.findAccountById(id);
         return RestBean.success(account.asViewObject(AccountVO.class));
     }
 
     @GetMapping("/details")
-    public RestBean<AccountDetailsVO> details(@RequestAttribute(Const.ATTR_USER_ID) int id){
+    public RestBean<AccountDetailsVO> details(@RequestAttribute(Const.ATTR_USER_ID) int id) {
         AccountDetails details = Optional
                 .ofNullable(detailsService.findAccountDetailsById(id))
                 .orElseGet(AccountDetails::new);
@@ -44,26 +51,39 @@ public class AccountController {
 
     @PostMapping("save-details")
     public RestBean<Void> saveDetails(@RequestAttribute(Const.ATTR_USER_ID) int id,
-                                      @RequestBody @Valid DetailsSaveVo vo){
+                                      @RequestBody @Valid DetailsSaveVo vo) {
         boolean success = detailsService.saveAccountDetails(id, vo);
         return success ? RestBean.success() : RestBean.failure(400, "此用户名已被其他用户使用");
     }
 
     @PostMapping("modify-email")
     public RestBean<Void> modifyEmail(@RequestAttribute(Const.ATTR_USER_ID) int id,
-                                      @RequestBody @Valid ModifyEmailVO vo){
+                                      @RequestBody @Valid ModifyEmailVO vo) {
         return this.messageHandle(() -> service.modifyEmail(id, vo));
     }
 
     @PostMapping("/change-password")
     public RestBean<Void> changePassword(@RequestAttribute(Const.ATTR_USER_ID) int id,
-                                         @RequestBody @Valid ChangePasswordVO vo){
+                                         @RequestBody @Valid ChangePasswordVO vo) {
         return this.messageHandle(() -> service.changePassword(id, vo));
     }
 
-    private <T> RestBean<T> messageHandle(Supplier<String> action){
+    @PostMapping("/save-privacy")
+    public RestBean<Void> savePrivacy(@RequestAttribute(Const.ATTR_USER_ID) int id,
+                                      @RequestBody @Valid PrivacySaveVo vo) {
+        privacyService.savePrivacy(id, vo);
+        return RestBean.success();
+    }
+
+    @GetMapping("/privacy")
+    public RestBean<AccountPrivacyVO> privacy(@RequestAttribute(Const.ATTR_USER_ID) int id) {
+        return RestBean.success(privacyService.accountPrivacy(id).asViewObject(AccountPrivacyVO.class));
+    }
+
+
+    private <T> RestBean<T> messageHandle(Supplier<String> action) {
         String message = action.get();
-        if(message == null)
+        if (message == null)
             return RestBean.success();
         else
             return RestBean.failure(400, message);
