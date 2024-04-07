@@ -38,14 +38,6 @@ const validateUsername = (rule, value, callback) => {
   }
 }
 
-const validateSameEmail = (rule, value, callback) => {
-  if (store.user.email === value) {
-    callback(new Error('请输入不同的电子邮件地址'))
-  } else {
-    callback()
-  }
-}
-
 const rules = {
   username: [
     {validator: validateUsername, trigger: ['blur', 'change']},
@@ -54,7 +46,6 @@ const rules = {
   email: [
     {required: true, message: '请输入邮件地址', trigger: 'blur'},
     {type: 'email', message: '请输入合法的电子邮件地址', trigger: ['blur', 'change']},
-    {validator: validateSameEmail, trigger: ['blur', 'change']}
   ]
 }
 
@@ -130,7 +121,7 @@ function modifyEmail() {
 </script>
 
 <template>
-  <div style="display: flex">
+  <div style="display: flex; max-width: 950px; margin: auto">
     <div class="setting-left">
       <card :icon="User" title="账号信息设置" v-loading="loading.form"
             desc="在这里编辑您的个人信息，您可以在隐私设置中选择是否展示这些信息">
