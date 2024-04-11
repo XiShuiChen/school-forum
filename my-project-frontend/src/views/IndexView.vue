@@ -106,6 +106,7 @@ function userLogout() {
             <el-menu
                 router
                 :default-active="$route.path"
+                :default-openeds="['1', '2', '3']"
                 style="min-height: calc(100vh - 55px)"
             >
               <el-sub-menu index="1">
@@ -116,7 +117,7 @@ function userLogout() {
                   <span><b>校园论坛</b></span>
                 </template>
 
-                <el-menu-item index="1-1">
+                <el-menu-item index="/index">
                   <template #title>
                     <el-icon>
                       <ChatDotSquare/>
