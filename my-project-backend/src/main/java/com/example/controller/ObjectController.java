@@ -11,8 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-
 @RestController
 @Slf4j
 public class ObjectController {
@@ -20,8 +18,9 @@ public class ObjectController {
     @Resource
     ImageService service;
 
-    @GetMapping("/images/avatar/**")
+    @GetMapping("/images/**")
     public void imageFetch(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        response.setHeader("Content-Type", "image/jpeg");
         this.fetchImage(request, response);
     }
 
