@@ -4,6 +4,9 @@ springdoc:
   swagger-ui:
     operations-sorter: alpha
 spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
   mail:
     host: smtp.163.com
     username: xi_shuichen@163.com

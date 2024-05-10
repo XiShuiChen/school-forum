@@ -6,7 +6,7 @@ import ImageResize from "quill-image-resize-vue"
 import {ImageExtend, QuillWatch} from "quill-image-super-solution-module"
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import axios from "axios";
-import {accessHeader} from "@/net";
+import {accessHeader, get} from "@/net";
 import {ElMessage} from "element-plus";
 
 Quill.register('modules/ImageResize', ImageResize)
@@ -20,18 +20,13 @@ const editor = reactive({
   type: null,
   title: '',
   text: '',
-  loading: false
+  loading: false,
+  types: []
 })
 
-const emit = defineEmits(['close'])
+get('/api/forum/types', data => editor.types = data)
 
-const types = [
-  {id: 1, name: '日常闲聊', desc: '在这里分享你的各种日常'},
-  {id: 2, name: '真诚交友', desc: '在校园里寻找和你志同道合的朋友'},
-  {id: 3, name: '问题反馈', desc: '反馈你在校园中遇到的各种问题'},
-  {id: 4, name: '恋爱官宣', desc: '向大家展示你的恋爱成果'},
-  {id: 5, name: '踩坑记录', desc: '将你遇到过的坑分享给大家，防止别人再次踩坑'},
-]
+const emit = defineEmits(['close'])
 
 const editorOption = {
   modules: {
@@ -51,7 +46,7 @@ const editorOption = {
         }
       }
     },
-    imageResize: {
+    ImageResize: {
       modules: ['Resize', 'DisplaySize']
     },
     ImageExtend: {
@@ -102,8 +97,8 @@ const editorOption = {
 
       <div style="display:flex; gap: 10px">
         <div style="width: 150px">
-          <el-select placeholder="请选择主题类型..." v-model="editor.type">
-            <el-option v-for="item in types" :value="item.id" :label="item.name"/>
+          <el-select placeholder="请选择主题类型..." v-model="editor.type" :disabled="!editor.types.length">
+            <el-option v-for="item in editor.types" :value="item.id" :label="item.name"/>
           </el-select>
         </div>
         <div style="flex: 1">

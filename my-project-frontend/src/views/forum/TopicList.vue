@@ -10,7 +10,7 @@ import TopicEditor from "@/components/TopicEditor.vue";
 
 const today = computed(() => {
   const date = new Date()
-  return `${date.getFullYear()} 年 ${date.getMonth()} 月 ${date.getDay()} 日`
+  return `${date.getFullYear()} 年 ${date.getMonth() + 1} 月 ${date.getDate()} 日`
 })
 
 const weather = reactive({
@@ -158,5 +158,9 @@ navigator.geolocation.getCurrentPosition(position => {
   &:hover {
     cursor: pointer;
   }
+}
+
+.dark .create-topic{
+  background-color: #232323;
 }
 </style>
