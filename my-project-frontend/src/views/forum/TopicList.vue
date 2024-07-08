@@ -116,20 +116,9 @@ navigator.geolocation.getCurrentPosition(position => {
           友情链接
           <el-divider style="margin:10px 0"/>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-gap: 10px; margin-top: 10px">
-          <div class="friend-link">
-            <el-image style="height: 80px; width: 140px"
-                      src="https://lupic.cdn.bcebos.com/20220708/3087023372_14_600_429.jpg"/>
-          </div>
-
-          <div class="friend-link">
-            <el-image style="height: 80px; width: 140px"
-                      src="https://lupic.cdn.bcebos.com/20220822/3087679787_14_561_400.jpg"/>
-          </div>
-        </div>
       </div>
     </div>
-    <topic-editor :show="editor" @close="editor = false"/>
+    <topic-editor :show="editor" @success="editor = false" @close="editor = false"/>
   </div>
 </template>
 

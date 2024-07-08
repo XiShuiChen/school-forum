@@ -3,7 +3,6 @@ package com.example.controller;
 import com.example.entity.RestBean;
 import com.example.entity.dto.Account;
 import com.example.entity.dto.AccountDetails;
-import com.example.entity.dto.AccountPrivacy;
 import com.example.entity.vo.request.ChangePasswordVO;
 import com.example.entity.vo.request.DetailsSaveVo;
 import com.example.entity.vo.request.ModifyEmailVO;
@@ -15,12 +14,12 @@ import com.example.service.AccountDetailsService;
 import com.example.service.AccountPrivacyService;
 import com.example.service.AccountService;
 import com.example.utils.Const;
+import com.example.utils.ControllerUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
 @RestController
 @RequestMapping("/api/user")
@@ -34,6 +33,9 @@ public class AccountController {
 
     @Resource
     AccountPrivacyService privacyService;
+
+    @Resource
+    ControllerUtils utils;
 
     @GetMapping("/info")
     public RestBean<AccountVO> info(@RequestAttribute(Const.ATTR_USER_ID) int id) {
@@ -59,13 +61,13 @@ public class AccountController {
     @PostMapping("modify-email")
     public RestBean<Void> modifyEmail(@RequestAttribute(Const.ATTR_USER_ID) int id,
                                       @RequestBody @Valid ModifyEmailVO vo) {
-        return this.messageHandle(() -> service.modifyEmail(id, vo));
+        return utils.messageHandle(() -> service.modifyEmail(id, vo));
     }
 
     @PostMapping("/change-password")
     public RestBean<Void> changePassword(@RequestAttribute(Const.ATTR_USER_ID) int id,
                                          @RequestBody @Valid ChangePasswordVO vo) {
-        return this.messageHandle(() -> service.changePassword(id, vo));
+        return utils.messageHandle(() -> service.changePassword(id, vo));
     }
 
     @PostMapping("/save-privacy")
@@ -78,14 +80,5 @@ public class AccountController {
     @GetMapping("/privacy")
     public RestBean<AccountPrivacyVO> privacy(@RequestAttribute(Const.ATTR_USER_ID) int id) {
         return RestBean.success(privacyService.accountPrivacy(id).asViewObject(AccountPrivacyVO.class));
-    }
-
-
-    private <T> RestBean<T> messageHandle(Supplier<String> action) {
-        String message = action.get();
-        if (message == null)
-            return RestBean.success();
-        else
-            return RestBean.failure(400, message);
     }
 }
