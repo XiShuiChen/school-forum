@@ -88,10 +88,4 @@ public class AccountController {
     public RestBean<AccountPrivacyVO> privacy(@RequestAttribute(Const.ATTR_USER_ID) int id) {
         return RestBean.success(privacyService.accountPrivacy(id).asViewObject(AccountPrivacyVO.class));
     }
-
-    @GetMapping("/list-topic")
-    public RestBean<List<TopicPreviewVO>> listTopic(@RequestParam @Min(0) int page,
-                                                    @RequestParam @Min(0) int type) {
-        return RestBean.success(topicService.listTopicByPage(page, type));
-    }
 }
