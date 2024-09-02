@@ -24,7 +24,7 @@ spring:
   security:
     jwt:
       key: 'qjsxepxjalzi'
-      expire: 72
+      expire: 720 # 24h * 30d = 720h 设置过期时间为30天
       limit:
         base: 10
         upgrade: 300

@@ -10,15 +10,19 @@ import com.example.entity.vo.request.PrivacySaveVo;
 import com.example.entity.vo.response.AccountDetailsVO;
 import com.example.entity.vo.response.AccountPrivacyVO;
 import com.example.entity.vo.response.AccountVO;
+import com.example.entity.vo.response.TopicPreviewVO;
 import com.example.service.AccountDetailsService;
 import com.example.service.AccountPrivacyService;
 import com.example.service.AccountService;
+import com.example.service.TopicService;
 import com.example.utils.Const;
 import com.example.utils.ControllerUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -33,6 +37,9 @@ public class AccountController {
 
     @Resource
     AccountPrivacyService privacyService;
+
+    @Resource
+    TopicService topicService;
 
     @Resource
     ControllerUtils utils;
@@ -80,5 +87,11 @@ public class AccountController {
     @GetMapping("/privacy")
     public RestBean<AccountPrivacyVO> privacy(@RequestAttribute(Const.ATTR_USER_ID) int id) {
         return RestBean.success(privacyService.accountPrivacy(id).asViewObject(AccountPrivacyVO.class));
+    }
+
+    @GetMapping("/list-topic")
+    public RestBean<List<TopicPreviewVO>> listTopic(@RequestParam @Min(0) int page,
+                                                    @RequestParam @Min(0) int type) {
+        return RestBean.success(topicService.listTopicByPage(page, type));
     }
 }
