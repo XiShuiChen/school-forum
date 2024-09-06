@@ -81,7 +81,7 @@ function resetList() {
 navigator.geolocation.getCurrentPosition(position => {
   const longitude = position.coords.longitude
   const latitude = position.coords.latitude
-  get(`api/forum/weather?longitude=${longitude}&latitude=${latitude}`, data => {
+  get(`/api/forum/weather?longitude=${longitude}&latitude=${latitude}`, data => {
     Object.assign(weather, data)
     weather.success = true
   })
