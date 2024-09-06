@@ -3,12 +3,13 @@
 import LightCard from "@/components/LightCard.vue";
 import {Calendar, Clock, CollectionTag, EditPen, Link} from "@element-plus/icons-vue";
 import Weather from "@/components/Weather.vue";
-import {computed, reactive, ref} from "vue";
+import {computed, reactive, ref, watch} from "vue";
 import {get} from "@/net";
 import {ElMessage} from "element-plus";
 import TopicEditor from "@/components/TopicEditor.vue";
 import {useStore} from "@/store";
 import axios from "axios";
+import ColorDot from "@/components/ColorDot.vue";
 
 const today = computed(() => {
   const date = new Date()
@@ -23,12 +24,28 @@ const weather = reactive({
 })
 
 const editor = ref(false)
-const list = ref(null)
 const store = useStore()
 
-get('/api/forum/types', data => store.forum.types = data)
+const topics = reactive({
+  list: [],
+  type: 0,
+  page: 0
+})
+
+watch(() => topics.type, () => {
+  topics.page = 0
+  topics.list = []
+  updateList()
+}, {immediate: true})
+
+get('/api/forum/types', data => {
+  const array = []
+  array.push({name: '全部', id: 0, color: 'linear-gradient(45deg, white, red, orange, gold, green, blue)'})
+  data.forEach(d => array.push(d))
+  store.forum.types = array
+})
 function updateList(){
-  get('/api/forum/list-topic?page=0&type=0', data => list.value = data)
+  get(`/api/forum/list-topic?page=${topics.page}&type=${topics.type}`, data => topics.list = data)
 }
 updateList()
 
@@ -65,44 +82,52 @@ navigator.geolocation.getCurrentPosition(position => {
         </div>
       </light-card>
 
-      <light-card style="margin-top: 10px; height: 30px">
-
+      <light-card style="margin-top: 10px; display: flex; gap: 7px">
+        <div :class="`type-select-card ${topics.type === item.id ? 'active' : ''}`" v-for="item in store.forum.types"
+              @click="topics.type = item.id">
+          <color-dot :color="item.color"/>
+          <span style="margin-left: 5px">{{item.name}}</span>
+        </div>
       </light-card>
 
-      <div style="margin-top: 10px; display: flex; flex-direction: column;gap: 10px">
-        <light-card v-for="item in list" class="topic-card">
-          <div style="display: flex">
-            <div>
-              <el-avatar :size="30" :src="`${axios.defaults.baseURL}/images${item.avatar}`"/>
-            </div>
-            <div style="margin-left: 7px; transform: translateY(-2px)">
-              <div style="font-size: 13px; font-weight: bold"> {{item.username}} </div>
-              <div style="font-size: 12px; color: grey">
-                <el-icon><Clock/></el-icon>
-                <div style="margin-left: 2px; display: inline-block; transform: translateY(-2px)">
-                  {{new Date(item.time).toLocaleString()}}
+      <transition name="el-fade-in" mode="out-in">
+        <div v-if="topics.list.length">
+          <div style="margin-top: 10px; display: flex; flex-direction: column;gap: 10px">
+            <light-card v-for="item in topics.list" class="topic-card">
+              <div style="display: flex">
+                <div>
+                  <el-avatar :size="30" :src="`${axios.defaults.baseURL}/images${item.avatar}`"/>
+                </div>
+                <div style="margin-left: 7px; transform: translateY(-2px)">
+                  <div style="font-size: 13px; font-weight: bold"> {{item.username}} </div>
+                  <div style="font-size: 12px; color: grey">
+                    <el-icon><Clock/></el-icon>
+                    <div style="margin-left: 2px; display: inline-block; transform: translateY(-2px)">
+                      {{new Date(item.time).toLocaleString()}}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <div style="margin-top: 5px">
-            <div class="topic-type"
-                  :style="{
+              <div style="margin-top: 5px">
+                <div class="topic-type"
+                     :style="{
                     color: store.findTypeById(item.type)?.color + 'EE',
                     'border-color': store.findTypeById(item.type)?.color + '77',
                     'background': store.findTypeById(item.type)?.color + '22',
                   }">
-              {{ store.findTypeById(item.type)?.name }}
-            </div>
-            <span style="font-weight: bold; margin-left: 7px"> {{ item.title }} </span>
+                  {{ store.findTypeById(item.type)?.name }}
+                </div>
+                <span style="font-weight: bold; margin-left: 7px"> {{ item.title }} </span>
+              </div>
+              <div class="topic-content">{{ item.text }}</div>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); grid-gap:10px">
+                <el-image class="topic-image" v-for="img in item.images" :src="img" fit="cover"></el-image>
+              </div>
+            </light-card>
           </div>
-          <div class="topic-content">{{ item.text }}</div>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); grid-gap:10px">
-            <el-image class="topic-image" v-for="img in item.images" :src="img" fit="cover"></el-image>
-          </div>
-        </light-card>
-      </div>
+        </div>
+      </transition>
     </div>
 
     <div style="width: 280px">
@@ -163,6 +188,24 @@ navigator.geolocation.getCurrentPosition(position => {
 </template>
 
 <style lang="less" scoped>
+.type-select-card {
+  background-color: #f5f5f5;
+  padding: 2px 7px;
+  font-size: 14px;
+  border-radius: 3px;
+  box-sizing: border-box;
+  transition: background-color .3s;
+
+  &.active {
+    border: solid 1px #ead4c4;
+  }
+
+  &:hover {
+    cursor: pointer;
+    background-color: #dadada;
+  }
+}
+
 .info-text {
   display: flex;
   justify-content: space-between;
@@ -187,10 +230,6 @@ navigator.geolocation.getCurrentPosition(position => {
   &:hover {
     cursor: pointer;
   }
-}
-
-.dark .create-topic {
-  background-color: #232323;
 }
 
 .topic-card {
@@ -227,6 +266,24 @@ navigator.geolocation.getCurrentPosition(position => {
     height: 100%;
     max-height: 110px;
     border-radius: 5px;
+  }
+}
+
+.dark {
+  .create-topic {
+    background-color: #232323;
+  }
+
+  .type-select-card {
+    background-color: #282828;
+
+    &.active {
+      border: solid 1px #64594b;
+    }
+
+    &:hover {
+      background-color: #5e5e5e;
+    }
   }
 }
 </style>
