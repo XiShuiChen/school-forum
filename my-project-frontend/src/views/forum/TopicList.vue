@@ -1,7 +1,18 @@
 <script setup>
 
 import LightCard from "@/components/LightCard.vue";
-import {Calendar, Clock, CollectionTag, EditPen, Link} from "@element-plus/icons-vue";
+import {
+  Calendar,
+  Clock,
+  CollectionTag,
+  Compass,
+  Document,
+  Edit,
+  EditPen,
+  Link,
+  Microphone,
+  Picture
+} from "@element-plus/icons-vue";
 import Weather from "@/components/Weather.vue";
 import {computed, reactive, ref, watch} from "vue";
 import {get} from "@/net";
@@ -30,7 +41,8 @@ const topics = reactive({
   list: [],
   type: 0,
   page: 0,
-  end: false
+  end: false,
+  top: []
 })
 
 watch(() => topics.type, () => resetList(), {immediate: true})
@@ -41,6 +53,7 @@ get('/api/forum/types', data => {
   data.forEach(d => array.push(d))
   store.forum.types = array
 })
+get('api/forum/top-topic', data => topics.top = data)
 
 function updateList(){
   if (topics.end) return
@@ -91,10 +104,22 @@ navigator.geolocation.getCurrentPosition(position => {
     <div style="flex: 1">
       <light-card>
         <div class="create-topic" @click="editor = true">
-          <el-icon>
-            <EditPen/>
-          </el-icon>
-          点击发表主题...
+          <el-icon><EditPen/></el-icon>点击发表主题...
+        </div>
+        <div style="margin-top: 10px; display: flex; gap:13px; font-size: 18px; color: grey">
+          <el-icon><Edit/></el-icon>
+          <el-icon><Document/></el-icon>
+          <el-icon><Compass/></el-icon>
+          <el-icon><Picture/></el-icon>
+          <el-icon><Microphone/></el-icon>
+        </div>
+      </light-card>
+
+      <light-card style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px">
+        <div v-for="item in topics.top" class="top-topic">
+          <el-tag type="info" size="small">置顶</el-tag>
+          <div>{{ item.title }}</div>
+          <div>{{ new Date(item.time).toLocaleDateString() }}</div>
         </div>
       </light-card>
 
@@ -205,6 +230,33 @@ navigator.geolocation.getCurrentPosition(position => {
 </template>
 
 <style lang="less" scoped>
+.top-topic {
+  display: flex;
+
+  div:first-of-type {
+    font-size: 14px;
+    margin-left: 10px;
+    font-weight: bold;
+    opacity: 0.8;
+    transition: color .3s;
+
+    &:hover {
+      color: grey;
+    }
+  }
+
+  div:nth-of-type(2) {
+    flex: 1;
+    color: grey;
+    font-size: 13px;
+    text-align: right;
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
 .type-select-card {
   background-color: #f5f5f5;
   padding: 2px 7px;
