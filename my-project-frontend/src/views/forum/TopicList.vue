@@ -29,14 +29,11 @@ const store = useStore()
 const topics = reactive({
   list: [],
   type: 0,
-  page: 0
+  page: 0,
+  end: false
 })
 
-watch(() => topics.type, () => {
-  topics.page = 0
-  topics.list = []
-  updateList()
-}, {immediate: true})
+watch(() => topics.type, () => resetList(), {immediate: true})
 
 get('/api/forum/types', data => {
   const array = []
@@ -44,10 +41,29 @@ get('/api/forum/types', data => {
   data.forEach(d => array.push(d))
   store.forum.types = array
 })
+
 function updateList(){
-  get(`/api/forum/list-topic?page=${topics.page}&type=${topics.type}`, data => topics.list = data)
+  if (topics.end) return
+  get(`/api/forum/list-topic?page=${topics.page}&type=${topics.type}`, data =>{
+    if (data) {
+      data.forEach(d => topics.list.push(d))
+      topics.page++
+    }
+    if (!data || data.length < 10) topics.end = true
+  })
 }
-updateList()
+
+function onTopicCreate(){
+  editor.value = false
+  resetList()
+}
+
+function resetList() {
+  topics.page = 0
+  topics.end = false
+  topics.list = []
+  updateList()
+}
 
 navigator.geolocation.getCurrentPosition(position => {
   const longitude = position.coords.longitude
@@ -92,7 +108,8 @@ navigator.geolocation.getCurrentPosition(position => {
 
       <transition name="el-fade-in" mode="out-in">
         <div v-if="topics.list.length">
-          <div style="margin-top: 10px; display: flex; flex-direction: column;gap: 10px">
+          <div style="margin-top: 10px; display: flex; flex-direction: column;gap: 10px"
+                      v-infinite-scroll="updateList">
             <light-card v-for="item in topics.list" class="topic-card">
               <div style="display: flex">
                 <div>
@@ -183,7 +200,7 @@ navigator.geolocation.getCurrentPosition(position => {
         </div>
       </div>
     </div>
-    <topic-editor :show="editor" @success="editor = false; updateList()" @close="editor = false"/>
+    <topic-editor :show="editor" @success="onTopicCreate" @close="editor = false"/>
   </div>
 </template>
 
