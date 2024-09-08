@@ -21,6 +21,8 @@ import TopicEditor from "@/components/TopicEditor.vue";
 import {useStore} from "@/store";
 import axios from "axios";
 import ColorDot from "@/components/ColorDot.vue";
+import router from "@/router";
+import TopicTag from "@/components/TopicTag.vue";
 
 const today = computed(() => {
   const date = new Date()
@@ -47,12 +49,6 @@ const topics = reactive({
 
 watch(() => topics.type, () => resetList(), {immediate: true})
 
-get('/api/forum/types', data => {
-  const array = []
-  array.push({name: '全部', id: 0, color: 'linear-gradient(45deg, white, red, orange, gold, green, blue)'})
-  data.forEach(d => array.push(d))
-  store.forum.types = array
-})
 get('api/forum/top-topic', data => topics.top = data)
 
 function updateList(){
@@ -116,7 +112,7 @@ navigator.geolocation.getCurrentPosition(position => {
       </light-card>
 
       <light-card style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px">
-        <div v-for="item in topics.top" class="top-topic">
+        <div v-for="item in topics.top" class="top-topic" @click="router.push(`/index/topic-detail/${item.id}`)">
           <el-tag type="info" size="small">置顶</el-tag>
           <div>{{ item.title }}</div>
           <div>{{ new Date(item.time).toLocaleDateString() }}</div>
@@ -135,7 +131,8 @@ navigator.geolocation.getCurrentPosition(position => {
         <div v-if="topics.list.length">
           <div style="margin-top: 10px; display: flex; flex-direction: column;gap: 10px"
                       v-infinite-scroll="updateList">
-            <light-card v-for="item in topics.list" class="topic-card">
+            <light-card v-for="item in topics.list" class="topic-card"
+                @click="router.push('/index/topic-detail/' + item.id)">
               <div style="display: flex">
                 <div>
                   <el-avatar :size="30" :src="`${axios.defaults.baseURL}/images${item.avatar}`"/>
@@ -152,14 +149,7 @@ navigator.geolocation.getCurrentPosition(position => {
               </div>
 
               <div style="margin-top: 5px">
-                <div class="topic-type"
-                     :style="{
-                    color: store.findTypeById(item.type)?.color + 'EE',
-                    'border-color': store.findTypeById(item.type)?.color + '77',
-                    'background': store.findTypeById(item.type)?.color + '22',
-                  }">
-                  {{ store.findTypeById(item.type)?.name }}
-                </div>
+                <topic-tag :type="item.type"/>
                 <span style="font-weight: bold; margin-left: 7px"> {{ item.title }} </span>
               </div>
               <div class="topic-content">{{ item.text }}</div>
@@ -319,15 +309,6 @@ navigator.geolocation.getCurrentPosition(position => {
     -webkit-line-clamp: 3;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-
-  .topic-type {
-    display: inline-block;
-    border: solid 0.5px grey;
-    border-radius: 3px;
-    font-size: 12px;
-    padding: 0 5px;
-    height: 18px;
   }
 
   .topic-image {
