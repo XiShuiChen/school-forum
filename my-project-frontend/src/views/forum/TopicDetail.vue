@@ -3,11 +3,13 @@ import {useRoute} from "vue-router";
 import {get} from "@/net";
 import axios from "axios";
 import {computed, reactive} from "vue";
-import {ArrowLeft, Female, Male} from "@element-plus/icons-vue";
+import {ArrowLeft, CircleCheck, Female, Male, Star} from "@element-plus/icons-vue";
 import {QuillDeltaToHtmlConverter} from 'quill-delta-to-html'
 import Card from "@/components/Card.vue";
 import router from "@/router";
 import TopicTag from "@/components/TopicTag.vue";
+import InteractButton from "@/components/InteractButton.vue";
+import {ElMessage} from "element-plus";
 
 const route = useRoute()
 
@@ -15,6 +17,8 @@ const tid = route.params.tid
 
 const topic = reactive({
   data: null,
+  like: false,
+  collect: false,
   comments: []
 })
 
@@ -22,20 +26,30 @@ get(`api/forum/topic?tid=${tid}`, data => topic.data = data)
 
 const content = computed(() => {
   const ops = JSON.parse(topic.data.content).ops
-  const converter = new QuillDeltaToHtmlConverter(ops, { inlineStyles: true })
+  const converter = new QuillDeltaToHtmlConverter(ops, {inlineStyles: true})
   return converter.convert()
 })
 
+function interact(type, message) {
+  get(`api/forum/interact?tid=${tid}&type=${type}&state=${!topic[type]}`,() => {
+    topic[type] = !topic[type]
+    if (topic[type])
+      ElMessage.success(`${message}成功！`)
+    else
+      ElMessage.success(`已取消${message}`)
+  })
+}
 
 </script>
 
 
 <template>
- <div class="topic-page" v-if="topic.data">
+  <div class="topic-page" v-if="topic.data">
     <div class="topic-main" style="position: sticky; top: 0; z-index: 10">
       <card style="display: flex; width: 100%">
         <el-button :icon="ArrowLeft" type="info" size="small"
-                   plain round @click="router.push('/index')">返回帖子列表</el-button>
+                   plain round @click="router.push('/index')">返回帖子列表
+        </el-button>
         <div style="text-align: center; flex: 1; margin-right: 50px;">
           <topic-tag :type="topic.data.type"/>
           <span style="font-weight: bold; margin-left: 5px">{{ topic.data.title }}</span>
@@ -43,7 +57,7 @@ const content = computed(() => {
       </card>
     </div>
 
-    <div class = topic-main>
+    <div class=topic-main>
       <div class="topic-main-left">
         <el-avatar :src="axios.defaults.baseURL + '/images' + topic.data.user.avatar"
                    :size="60"/>
@@ -51,14 +65,18 @@ const content = computed(() => {
           <div style="font-size: 18px; font-weight: bold">
             {{ topic.data.user.username }}
             <span style="color: hotpink" v-if="topic.data.user.gender === 1">
-              <el-icon size="15px" style="vertical-align: middle"><Female/></el-icon>
+              <el-icon size="15px" style="vertical-align: middle">
+                <Female/>
+              </el-icon>
             </span>
             <span style="color: dodgerblue" v-if="topic.data.user.gender === 0">
-              <el-icon size="15px" style="vertical-align: middle"><Male/></el-icon>
+              <el-icon size="15px" style="vertical-align: middle">
+                <Male/>
+              </el-icon>
             </span>
           </div>
 
-          <div class="desc"> {{ topic.data.user.email }} </div>
+          <div class="desc"> {{ topic.data.user.email }}</div>
           <el-divider style="margin: 10px 0"/>
 
           <div style="text-align: left; margin: 0 5px">
@@ -68,19 +86,30 @@ const content = computed(() => {
           </div>
           <el-divider style="margin: 10px 0"/>
 
-          <div class="desc" style="margin: 10px 0; text-align: left"> {{ topic.data.user.desc }} </div>
+          <div class="desc" style="margin: 10px 0; text-align: left"> {{ topic.data.user.desc }}</div>
         </div>
       </div>
 
       <div class="topic-main-right">
         <div class="topic-content" v-html="content"></div>
+        <div style="text-align: right; margin-top: 30px">
+          <interact-button name="点赞" check-name="已点赞" color="#E33A9CFF" :check="topic.like"
+                           @check="interact('like', '点赞')">
+            <el-icon><CircleCheck/></el-icon>
+          </interact-button>
+
+          <interact-button name="收藏" check-name="已收藏" color="#EBA60FFF" :check="topic.collect"
+                           @check="interact('collect', '收藏')" style="margin: 0 20px 0 25px;">
+            <el-icon><Star/></el-icon>
+          </interact-button>
+        </div>
       </div>
     </div>
 
     <div>
 
     </div>
- </div>
+  </div>
 </template>
 
 
