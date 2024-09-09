@@ -22,7 +22,11 @@ const topic = reactive({
   comments: []
 })
 
-get(`api/forum/topic?tid=${tid}`, data => topic.data = data)
+get(`api/forum/topic?tid=${tid}`, data => {
+  topic.data = data
+  topic.like = data.interact.like
+  topic.collect = data.interact.collect
+})
 
 const content = computed(() => {
   const ops = JSON.parse(topic.data.content).ops
