@@ -2,7 +2,7 @@
 
 import LightCard from "@/components/LightCard.vue";
 import {
-  Calendar,
+  Calendar, CircleCheck,
   Clock,
   CollectionTag,
   Compass,
@@ -11,7 +11,7 @@ import {
   EditPen,
   Link,
   Microphone,
-  Picture
+  Picture, Star
 } from "@element-plus/icons-vue";
 import Weather from "@/components/Weather.vue";
 import {computed, reactive, ref, watch} from "vue";
@@ -155,6 +155,15 @@ navigator.geolocation.getCurrentPosition(position => {
               <div class="topic-content">{{ item.text }}</div>
               <div style="display: grid; grid-template-columns: repeat(3, 1fr); grid-gap:10px">
                 <el-image class="topic-image" v-for="img in item.images" :src="img" fit="cover"></el-image>
+              </div>
+
+              <div style="display: flex; gap: 20px; font-size: 13px; margin-top: 10px; opacity: 0.9">
+                <div>
+                  <el-icon style="vertical-align: -10%"><CircleCheck/></el-icon> {{ item.like }}点赞
+                </div>
+                <div>
+                  <el-icon style="vertical-align: -10%"><Star/></el-icon> {{ item.collect }}收藏
+                </div>
               </div>
             </light-card>
           </div>
