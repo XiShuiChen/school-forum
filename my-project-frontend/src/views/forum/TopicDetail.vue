@@ -96,6 +96,10 @@ function interact(type, message) {
 
       <div class="topic-main-right">
         <div class="topic-content" v-html="content"></div>
+        <el-divider/>
+        <div style="font-size: 13px; color: #737171; text-align: left">
+          <div>发帖时间：{{ new Date(topic.data.time).toLocaleString() }}</div>
+        </div>
         <div style="text-align: right; margin-top: 30px">
           <interact-button name="点赞" check-name="已点赞" color="#E33A9CFF" :check="topic.like"
                            @check="interact('like', '点赞')">
