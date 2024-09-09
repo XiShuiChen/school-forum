@@ -192,6 +192,8 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
         TopicPreviewVO vo = new TopicPreviewVO();
         BeanUtils.copyProperties(accountMapper.selectById(topic.getUid()), vo);
         BeanUtils.copyProperties(topic, vo);
+        vo.setLike(baseMapper.interactCount(topic.getId(), "like"));
+        vo.setCollect(baseMapper.interactCount(topic.getId(), "collect"));
         List<String> images = new ArrayList<>();
         StringBuilder previewText = new StringBuilder();
         JSONArray ops = JSONObject.parseObject(topic.getContent()).getJSONArray("ops");
