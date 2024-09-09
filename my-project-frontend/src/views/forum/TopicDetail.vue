@@ -36,7 +36,7 @@ const content = computed(() => {
       <card style="display: flex; width: 100%">
         <el-button :icon="ArrowLeft" type="info" size="small"
                    plain round @click="router.push('/index')">返回帖子列表</el-button>
-        <div style="text-align: center; flex: 1">
+        <div style="text-align: center; flex: 1; margin-right: 50px;">
           <topic-tag :type="topic.data.type"/>
           <span style="font-weight: bold; margin-left: 5px">{{ topic.data.title }}</span>
         </div>
@@ -51,10 +51,10 @@ const content = computed(() => {
           <div style="font-size: 18px; font-weight: bold">
             {{ topic.data.user.username }}
             <span style="color: hotpink" v-if="topic.data.user.gender === 1">
-              <el-icon><Female/></el-icon>
+              <el-icon size="15px" style="vertical-align: middle"><Female/></el-icon>
             </span>
             <span style="color: dodgerblue" v-if="topic.data.user.gender === 0">
-              <el-icon><Male/></el-icon>
+              <el-icon size="15px" style="vertical-align: middle"><Male/></el-icon>
             </span>
           </div>
 
@@ -97,7 +97,7 @@ const content = computed(() => {
   border-radius: 7px;
   margin: 0 auto;
   background-color: var(--el-bg-color);
-  width: 800px;
+  width: 900px;
 
   .topic-main-left {
     width: 200px;
@@ -112,13 +112,13 @@ const content = computed(() => {
   }
 
   .topic-main-right {
-    width: 600px;
+    width: 700px;
     padding: 10px 20px;
 
     .topic-content {
       font-size: 14px;
       line-height: 22px;
-      opacity: 0.8;
+      opacity: 0.9;
     }
   }
 }
