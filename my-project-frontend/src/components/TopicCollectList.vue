@@ -4,6 +4,7 @@ import {get} from "@/net";
 import LightCard from "@/components/LightCard.vue";
 import router from "@/router";
 import TopicTag from "@/components/TopicTag.vue";
+import {ElMessage} from "element-plus";
 
 defineProps({
   show: Boolean
@@ -17,21 +18,24 @@ function init() {
   get('api/forum/collects', data => list.value = data)
 }
 
-function deleteCollect() {
-
+function deleteCollect(index, tid) {
+  get(`api/forum/interact?tid=${tid}&type=collect&state=false`, () => {
+    ElMessage.success('已取消收藏')
+    list.value.splice(index, 1)
+  })
 }
 </script>
 
 <template>
   <el-drawer :model-value="show" @close="emit('close')" @open="init" title="帖子收藏列表">
     <div class="collect-list">
-      <light-card v-for="item in list" class="topic-card"
+      <light-card v-for="(item, index) in list" class="topic-card"
                   @click="router.push(`/index/topic-detail/${item.id}`)">
         <topic-tag :type="item.type" style="transform: translateY(2px)"/>
         <div class="title">
           <b>{{ item.title }}</b>
         </div>
-        <el-link type="danger" @click.stop="">删除</el-link>
+        <el-link type="danger" @click.stop="deleteCollect(index, item.id)">删除</el-link>
       </light-card>
     </div>
   </el-drawer>
