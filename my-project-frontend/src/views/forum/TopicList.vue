@@ -2,13 +2,14 @@
 
 import LightCard from "@/components/LightCard.vue";
 import {
+  ArrowRightBold,
   Calendar, CircleCheck,
   Clock,
   CollectionTag,
   Compass,
   Document,
   Edit,
-  EditPen,
+  EditPen, FolderOpened,
   Link,
   Microphone,
   Picture, Star
@@ -23,6 +24,7 @@ import axios from "axios";
 import ColorDot from "@/components/ColorDot.vue";
 import router from "@/router";
 import TopicTag from "@/components/TopicTag.vue";
+import TopicCollectList from "@/components/TopicCollectList.vue";
 
 const today = computed(() => {
   const date = new Date()
@@ -46,6 +48,7 @@ const topics = reactive({
   end: false,
   top: []
 })
+const collects = ref(false)
 
 watch(() => topics.type, () => resetList(), {immediate: true})
 
@@ -174,6 +177,16 @@ navigator.geolocation.getCurrentPosition(position => {
     <div style="width: 280px">
       <div style="position: sticky; top: 20px">
         <light-card>
+          <div class="collect-list-button" @click="collects = true">
+            <span>
+              <el-icon style="vertical-align: -10%; margin-right: 3px;">
+                <FolderOpened/>
+              </el-icon>查看我的收藏</span>
+            <el-icon style="transform: translateY(5px)"><ArrowRightBold/></el-icon>
+          </div>
+        </light-card>
+
+        <light-card style="margin-top: 10px">
           <div style="font-weight: bold">
             <el-icon>
               <CollectionTag/>
@@ -184,8 +197,7 @@ navigator.geolocation.getCurrentPosition(position => {
           <el-divider style="margin: 10px 0"/>
 
           <div style="font-size: 14px; margin: 10px; color: grey">
-            这件事拥护的人不多，反对的人不少。这两件事都没有完。这笔“遗产”得交给下一代。
-            怎么交？和平交不成就动荡中交，搞不好就得“血雨腥风”了。你们怎么办？只有天知道。
+            不要学java快跑快跑快跑
           </div>
         </light-card>
 
@@ -225,10 +237,24 @@ navigator.geolocation.getCurrentPosition(position => {
       </div>
     </div>
     <topic-editor :show="editor" @success="onTopicCreate" @close="editor = false"/>
+
+    <topic-collect-list :show="collects" @close="collects = false"/>
   </div>
 </template>
 
 <style lang="less" scoped>
+.collect-list-button {
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  transition: .3s;
+
+  &:hover {
+    cursor: pointer;
+    opacity: 0.6;
+  }
+}
+
 .top-topic {
   display: flex;
 
