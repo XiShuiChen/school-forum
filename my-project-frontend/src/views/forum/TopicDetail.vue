@@ -3,7 +3,7 @@ import {useRoute} from "vue-router";
 import {get, post} from "@/net";
 import axios from "axios";
 import {computed, reactive, ref} from "vue";
-import {ArrowLeft, CircleCheck, EditPen, Female, Male, Star} from "@element-plus/icons-vue";
+import {ArrowLeft, ChatSquare, CircleCheck, EditPen, Female, Male, Star} from "@element-plus/icons-vue";
 import {QuillDeltaToHtmlConverter} from 'quill-delta-to-html'
 import Card from "@/components/Card.vue";
 import router from "@/router";
@@ -12,6 +12,7 @@ import InteractButton from "@/components/InteractButton.vue";
 import {ElMessage} from "element-plus";
 import {useStore} from "@/store";
 import TopicEditor from "@/components/TopicEditor.vue";
+import TopicCommentEditor from "@/components/TopicCommentEditor.vue";
 
 const route = useRoute()
 const store = useStore()
@@ -26,6 +27,11 @@ const topic = reactive({
 })
 
 const edit = ref(false)
+const comment = reactive({
+  show: false,
+  text: '',
+  quote: -1
+})
 
 const init = () => get(`api/forum/topic?tid=${tid}`, data => {
   topic.data = data
@@ -140,11 +146,37 @@ function updateTopic(editor) {
     <topic-editor :show="edit" @close="edit = false" v-if="topic.data && store.forum.types"
                   :default-type="topic.data.type" :default-text="topic.data.content"
                   :default-title="topic.data.title" submit-button="更新帖子" :submit="updateTopic"/>
+
+    <topic-comment-editor :show="comment.show" @close="comment.show = false"
+                          :tid="tid" :quote="comment.quote"/>
+    <div class="add-comment" @click="comment.show = true">
+      <el-icon><ChatSquare/></el-icon>
+    </div>
   </div>
 </template>
 
 
 <style scoped>
+.add-comment {
+  position: fixed;
+  bottom: 20px;
+  right: 60px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 20px;
+  color: var(--el-color-primary);
+  text-align: center;
+  line-height: 45px;
+  background: var(--el-bg-color-overlay);
+  box-shadow: var(--el-box-shadow-lighter);
+
+  &:hover {
+    background: var(--el-border-color-extra-light);
+    cursor: pointer;
+  }
+}
+
 .topic-page {
   display: flex;
   flex-direction: column;
