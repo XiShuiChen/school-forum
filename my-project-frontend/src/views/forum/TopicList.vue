@@ -116,7 +116,7 @@ navigator.geolocation.getCurrentPosition(position => {
 
       <light-card style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px">
         <div v-for="item in topics.top" class="top-topic" @click="router.push(`/index/topic-detail/${item.id}`)">
-          <el-tag type="info" size="small">置顶</el-tag>
+          <el-tag style="transform: translateY(1px)" type="danger" size="small">置顶</el-tag>
           <div>{{ item.title }}</div>
           <div>{{ new Date(item.time).toLocaleDateString() }}</div>
         </div>
