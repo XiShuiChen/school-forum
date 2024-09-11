@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.*;
+import com.example.entity.vo.request.AddCommentVO;
 import com.example.entity.vo.request.TopicCreateVO;
 import com.example.entity.vo.request.TopicUpdateVO;
 import com.example.entity.vo.response.TopicDetailVO;
@@ -52,6 +53,9 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
     @Resource
     StringRedisTemplate template;
 
+    @Resource
+    TopicCommentMapper commentMapper;
+
     @PostConstruct
     private void initTypes() {
         types = this.listTypes()
@@ -69,7 +73,7 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
 
     @Override
     public String createTopic(int uid, TopicCreateVO vo) {
-        if (!textLimitCheck(vo.getContent()))
+        if (!textLimitCheck(vo.getContent(), 20000))
             return "文章字数过多！发文失败";
         if (!types.contains(vo.getType()))
             return "文章类型非法！";
@@ -89,9 +93,25 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
         }
     }
 
+
+    @Override
+    public String createComment(int uid, AddCommentVO vo) {
+        if (!textLimitCheck(JSONObject.parseObject(vo.getContent()), 2000))
+            return "评论内容过多！发表失败";
+        String key = Const.FORUM_TOPIC_COMMENT_COUNTER + uid;
+        if (!flowUtils.limitPeriodCounterCheck(key, 2, 60))
+            return "发表评论频繁，请稍后再试";
+        TopicComment comment = new TopicComment();
+        comment.setUid(uid);
+        BeanUtils.copyProperties(vo, comment);
+        comment.setTime(new Date());
+        commentMapper.insert(comment);
+        return null;
+    }
+
     @Override
     public String updateTopic(int uid, TopicUpdateVO vo) {
-        if (!textLimitCheck(vo.getContent()))
+        if (!textLimitCheck(vo.getContent(), 20000))
             return "文章字数过多！发文失败";
         if (!types.contains(vo.getType()))
             return "文章类型非法！";
@@ -239,12 +259,12 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
         return vo;
     }
 
-    private boolean textLimitCheck(JSONObject object) {
+    private boolean textLimitCheck(JSONObject object, int max) {
         if (object == null) return false;
         long length = 0;
         for (Object op : object.getJSONArray("ops")) {
             length += JSONObject.from(op).getString("insert").length();
-            if (length > 20000) return false;
+            if (length > max) return false;
         }
         return true;
     }
