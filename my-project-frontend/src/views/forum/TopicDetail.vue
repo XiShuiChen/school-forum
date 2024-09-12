@@ -23,7 +23,8 @@ const topic = reactive({
   data: null,
   like: false,
   collect: false,
-  comments: []
+  comments: null,
+  page: 1
 })
 
 const edit = ref(false)
@@ -37,15 +38,15 @@ const init = () => get(`api/forum/topic?tid=${tid}`, data => {
   topic.data = data
   topic.like = data.interact.like
   topic.collect = data.interact.collect
+  loadComments(1)
 })
 init()
 
-
-const content = computed(() => {
-  const ops = JSON.parse(topic.data.content).ops
+function convertToHtml(content) {
+  const ops = JSON.parse(content).ops
   const converter = new QuillDeltaToHtmlConverter(ops, {inlineStyles: true})
   return converter.convert()
-})
+}
 
 function interact(type, message) {
   get(`api/forum/interact?tid=${tid}&type=${type}&state=${!topic[type]}`,() => {
@@ -68,6 +69,17 @@ function updateTopic(editor) {
     edit.value = false
     init()
   })
+}
+
+function loadComments(page) {
+  topic.comments = null
+  topic.page = page
+  get(`api/forum/comments?tid=${tid}&page=${page - 1}`, data => topic.comments = data)
+}
+
+function onCommentAdd() {
+  comment.show = false
+  loadComments(Math.floor(topic.data.comments++ / 10) + 1)
 }
 </script>
 
@@ -120,7 +132,7 @@ function updateTopic(editor) {
       </div>
 
       <div class="topic-main-right">
-        <div class="topic-content" v-html="content"></div>
+        <div class="topic-content" v-html="convertToHtml(topic.data.content)"></div>
         <el-divider/>
         <div style="font-size: 13px; color: #737171; text-align: left">
           <div>发帖时间：{{ new Date(topic.data.time).toLocaleString() }}</div>
@@ -143,12 +155,62 @@ function updateTopic(editor) {
         </div>
       </div>
     </div>
+
+    <transition name="el-fade-in-linear" mode="out-in">
+      <div v-if="topic.comments">
+        <div class="topic-main" style="margin-top: 10px;" v-for="item in topic.comments">
+          <div class="topic-main-left">
+            <el-avatar :src="axios.defaults.baseURL + '/images' + item.user.avatar"
+                       :size="60"/>
+            <div>
+              <div style="font-size: 18px; font-weight: bold">
+                {{ item.user.username }}
+                <span style="color: hotpink" v-if="item.user.gender === 1">
+                  <el-icon size="15px" style="vertical-align: middle">
+                    <Female/>
+                  </el-icon>
+                </span>
+                <span style="color: dodgerblue" v-if="item.user.gender === 0">
+                  <el-icon size="15px" style="vertical-align: middle">
+                    <Male/>
+                  </el-icon>
+                </span>
+              </div>
+
+              <div class="desc"> {{ item.user.email }}</div>
+              <el-divider style="margin: 10px 0"/>
+
+              <div style="text-align: left; margin: 0 5px">
+                <div class="desc">微信号：{{ item.user.wx || '已隐藏或未填写' }}</div>
+                <div class="desc">qq号：{{ item.user.qq || '已隐藏或未填写' }}</div>
+                <div class="desc">手机号：{{ item.user.phone || '已隐藏或未填写' }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="topic-main-right">
+            <div style="font-size: 13px; color: #737171; margin-top: 10px">
+              <div>评论时间：{{ new Date(item.time).toLocaleString() }}</div>
+            </div>
+            <div class="topic-content" v-html="convertToHtml(item.content)"></div>
+          </div>
+        </div>
+
+        <div style="width: fit-content; margin: 35px auto">
+          <el-pagination background layout="prev, pager, next"
+                         v-model:current-page="topic.page" @current-change="loadComments"
+                         :total="topic.data.comments" :page-size="10"
+                         hide-on-single-page/>
+        </div>
+      </div>
+    </transition>
+
     <topic-editor :show="edit" @close="edit = false" v-if="topic.data && store.forum.types"
                   :default-type="topic.data.type" :default-text="topic.data.content"
                   :default-title="topic.data.title" submit-button="更新帖子" :submit="updateTopic"/>
 
     <topic-comment-editor :show="comment.show" @close="comment.show = false"
-                          :tid="tid" :quote="comment.quote"/>
+                          :tid="tid" :quote="comment.quote" @comment="onCommentAdd"/>
     <div class="add-comment" @click="comment.show = true">
       <el-icon><ChatSquare/></el-icon>
     </div>

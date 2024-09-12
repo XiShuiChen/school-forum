@@ -168,6 +168,7 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
         vo.setInteract(interact);
         TopicDetailVO.User user = new TopicDetailVO.User();
         vo.setUser(this.fillUserDetailsByPrivacy(user, topic.getUid()));
+        vo.setComments(commentMapper.selectCount(Wrappers.<TopicComment>query().eq("tid", tid)));
         return vo;
     }
 
@@ -194,13 +195,15 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
     @Override
     public List<CommentVO> comments(int tid, int pageNumber) {
         Page<TopicComment> page = Page.of(pageNumber, 10);
-        commentMapper.selectPage(page, Wrappers.<TopicComment>query().eq("tid", tid));
+        commentMapper.selectPage(page, Wrappers.<TopicComment>query().eq("tid", tid).orderByAsc("time"));
         return page.getRecords().stream().map(dto -> {
             CommentVO vo = new CommentVO();
             BeanUtils.copyProperties(dto, vo);
             if (dto.getQuote() > 0) {
                 JSONObject object = JSONObject.parseObject(
-                        commentMapper.selectOne(Wrappers.<TopicComment>query().eq("id", dto.getId())).getContent()
+                        commentMapper.selectOne(Wrappers.
+                                <TopicComment>query()
+                                .eq("id", dto.getId())).getContent()
                 );
                 StringBuilder builder = new StringBuilder();
                 this.shortContent(object.getJSONArray("ops"), builder, ignore -> {});
