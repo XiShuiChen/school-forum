@@ -9,6 +9,7 @@ import com.example.entity.dto.*;
 import com.example.entity.vo.request.AddCommentVO;
 import com.example.entity.vo.request.TopicCreateVO;
 import com.example.entity.vo.request.TopicUpdateVO;
+import com.example.entity.vo.response.CommentVO;
 import com.example.entity.vo.response.TopicDetailVO;
 import com.example.entity.vo.response.TopicPreviewVO;
 import com.example.entity.vo.response.TopicTopVO;
@@ -27,6 +28,7 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -189,6 +191,28 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
                 }).toList();
     }
 
+    @Override
+    public List<CommentVO> comments(int tid, int pageNumber) {
+        Page<TopicComment> page = Page.of(pageNumber, 10);
+        commentMapper.selectPage(page, Wrappers.<TopicComment>query().eq("tid", tid));
+        return page.getRecords().stream().map(dto -> {
+            CommentVO vo = new CommentVO();
+            BeanUtils.copyProperties(dto, vo);
+            if (dto.getQuote() > 0) {
+                JSONObject object = JSONObject.parseObject(
+                        commentMapper.selectOne(Wrappers.<TopicComment>query().eq("id", dto.getId())).getContent()
+                );
+                StringBuilder builder = new StringBuilder();
+                this.shortContent(object.getJSONArray("ops"), builder, ignore -> {});
+                vo.setQuote(builder.toString());
+            }
+            CommentVO.User user = new CommentVO.User();
+            this.fillUserDetailsByPrivacy(user, dto.getUid());
+            vo.setUser(user);
+            return vo;
+        }).toList();
+    }
+
     private boolean hasInteract(int tid, int uid, String type) {
         String key = tid + ":" + uid;
         if (template.opsForHash().hasKey(type, key))
@@ -245,15 +269,7 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
         List<String> images = new ArrayList<>();
         StringBuilder previewText = new StringBuilder();
         JSONArray ops = JSONObject.parseObject(topic.getContent()).getJSONArray("ops");
-        for (Object op : ops) {
-            Object insert = JSONObject.from(op).get("insert");
-            if (insert instanceof String text) {
-                if (previewText.length() >= 300) continue;
-                previewText.append(text);
-            } else if (insert instanceof Map<?,?> map) {
-                Optional.ofNullable(map.get("image")).ifPresent(obj -> images.add(obj.toString()));
-            }
-        }
+        this.shortContent(ops, previewText, obj -> images.add(obj.toString()));
         vo.setText(previewText.length() > 300 ? previewText.substring(0, 300) : previewText.toString());
         vo.setImages(images);
         return vo;
@@ -267,5 +283,18 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
             if (length > max) return false;
         }
         return true;
+    }
+
+    private void shortContent(JSONArray ops, StringBuilder previewText, Consumer<Object> imageHandler) {
+        for (Object op : ops) {
+            Object insert = JSONObject.from(op).get("insert");
+            if (insert instanceof String text) {
+                if (previewText.length() >= 300) continue;
+                previewText.append(text);
+            } else if (insert instanceof Map<?,?> map) {
+                Optional.ofNullable(map.get("image"))
+                        .ifPresent(imageHandler);
+            }
+        }
     }
 }
