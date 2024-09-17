@@ -2,8 +2,8 @@
 import {useRoute} from "vue-router";
 import {get, post} from "@/net";
 import axios from "axios";
-import {computed, reactive, ref} from "vue";
-import {ArrowLeft, ChatSquare, CircleCheck, EditPen, Female, Male, Star} from "@element-plus/icons-vue";
+import {reactive, ref} from "vue";
+import {ArrowLeft, ChatSquare, CircleCheck, Delete, EditPen, Female, Male, Star} from "@element-plus/icons-vue";
 import {QuillDeltaToHtmlConverter} from 'quill-delta-to-html'
 import Card from "@/components/Card.vue";
 import router from "@/router";
@@ -31,7 +31,7 @@ const edit = ref(false)
 const comment = reactive({
   show: false,
   text: '',
-  quote: -1
+  quote: null
 })
 
 const init = () => get(`api/forum/topic?tid=${tid}`, data => {
@@ -192,7 +192,19 @@ function onCommentAdd() {
             <div style="font-size: 13px; color: #737171; margin-top: 10px">
               <div>评论时间：{{ new Date(item.time).toLocaleString() }}</div>
             </div>
+
+            <div v-if="item.quote" class="comment-quote">
+              回复：{{ item.quote }}
+            </div>
             <div class="topic-content" v-html="convertToHtml(item.content)"></div>
+            <div style="text-align: right">
+              <el-link :icon="ChatSquare" @click="comment.show = true; comment.quote = item"
+                        type="info">
+                &nbsp;回复评论</el-link>
+              <el-link :icon="Delete" v-if="item.user.id === store.user.id"
+                       type="danger" style="margin-left: 20px">
+                &nbsp;删除评论</el-link>
+            </div>
           </div>
         </div>
 
@@ -211,7 +223,7 @@ function onCommentAdd() {
 
     <topic-comment-editor :show="comment.show" @close="comment.show = false"
                           :tid="tid" :quote="comment.quote" @comment="onCommentAdd"/>
-    <div class="add-comment" @click="comment.show = true">
+    <div class="add-comment" @click="comment.show = true; comment.quote = null">
       <el-icon><ChatSquare/></el-icon>
     </div>
   </div>
@@ -219,6 +231,15 @@ function onCommentAdd() {
 
 
 <style scoped>
+.comment-quote {
+  font-size: 13px;
+  color: #9f9b9b;
+  background-color: rgba(169, 159, 159, 0.2);
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+
 .add-comment {
   position: fixed;
   bottom: 20px;
