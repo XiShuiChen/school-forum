@@ -203,7 +203,7 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
                 JSONObject object = JSONObject.parseObject(
                         commentMapper.selectOne(Wrappers.
                                 <TopicComment>query()
-                                .eq("id", dto.getId())).getContent()
+                                .eq("id", dto.getQuote())).getContent()
                 );
                 StringBuilder builder = new StringBuilder();
                 this.shortContent(object.getJSONArray("ops"), builder, ignore -> {});
