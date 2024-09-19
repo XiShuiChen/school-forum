@@ -1,7 +1,7 @@
 <script setup>
 import {Delta, QuillEditor} from "@vueup/vue-quill";
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import {post} from "@/net";
 import {ElMessage} from "element-plus";
 
@@ -18,6 +18,10 @@ const emit = defineEmits(['close', 'comment'])
 const init = () => content.value = new Delta()
 
 function submitComment() {
+  if (deltaToText(content.value).length > 2000) {
+    ElMessage.warning('评论字数已超出限制！请删减后再试')
+    return
+  }
   post('api/forum/add-comment', {
     tid: props.tid,
     quote: props.quote ? props.quote.id : -1,
@@ -29,12 +33,18 @@ function submitComment() {
 }
 
 function deltaToSimpleText(delta) {
-  let str = ''
-  for (let op of JSON.parse(delta).ops) {
-    str += op.insert
-  }
+  let str = deltaToText(JSON.parse(delta))
   if (str.length > 35) str = str.substring(0, 35) + "..."
   return str
+}
+
+function deltaToText(delta) {
+  if (!delta?.ops) return ""
+  let str = ""
+  for (let op of delta.ops) {
+    str += op.insert
+  }
+  return str.replace(/\s/g, "")
 }
 </script>
 
@@ -49,7 +59,10 @@ function deltaToSimpleText(delta) {
           <quill-editor style="height: 120px" v-model:content="content" placeholder="留下一条友善的评论吧..."/>
         </div>
 
-        <div style="margin-top: 10px; text-align: right">
+        <div style="margin: 10px 0 0 3px; display: flex;">
+          <div style="flex: 1; font-size: 13px; color: grey">
+            当前字数：{{ deltaToText(content).length }} 字（最大支持2000字）
+          </div>
           <el-button @click="submitComment" type="success">发表评论</el-button>
         </div>
       </div>
