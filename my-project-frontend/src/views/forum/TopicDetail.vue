@@ -81,6 +81,13 @@ function onCommentAdd() {
   comment.show = false
   loadComments(Math.floor(topic.data.comments++ / 10) + 1)
 }
+
+function deleteComment(id) {
+  get(`/api/forum/delete-comment?id=${id}`, () => {
+    ElMessage.success('删除评论成功')
+    loadComments(topic.page)
+  })
+}
 </script>
 
 
@@ -202,7 +209,7 @@ function onCommentAdd() {
                         type="info">
                 &nbsp;回复评论</el-link>
               <el-link :icon="Delete" v-if="item.user.id === store.user.id"
-                       type="danger" style="margin-left: 20px">
+                       type="danger" style="margin-left: 20px" @click="deleteComment(item.id)">
                 &nbsp;删除评论</el-link>
             </div>
           </div>
