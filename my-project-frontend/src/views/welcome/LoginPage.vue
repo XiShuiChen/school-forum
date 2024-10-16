@@ -37,7 +37,9 @@
       </el-form>
     </div>
     <div style="margin-top: 30px">
-      <el-button @click="userLogin()" style="width: 270px" type="success" plain>立即登录</el-button>
+      <el-button @mousedown="e => e.preventDefault()" @click="userLogin()" style="width: 270px" type="success" plain>
+        立即登录
+      </el-button>
     </div>
     <el-divider>
       <span style="color: grey;font-size: 13px">没有账号</span>

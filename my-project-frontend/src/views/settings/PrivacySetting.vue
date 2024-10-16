@@ -89,19 +89,24 @@ function savePrivacy(type, status) {
       <card :icon="Setting" v-loading="saving" title="隐私设置" desc="请在这里设置您的个人隐私">
         <div class="checkbox-list">
           <el-checkbox @change="savePrivacy('phone', privacy.phone)"
-                       v-model="privacy.phone">公开展示我的手机号</el-checkbox>
+                       v-model="privacy.phone">公开展示我的手机号
+          </el-checkbox>
 
           <el-checkbox @change="savePrivacy('email', privacy.email)"
-                       v-model="privacy.email">公开展示我的电子邮件地址</el-checkbox>
+                       v-model="privacy.email">公开展示我的电子邮件地址
+          </el-checkbox>
 
           <el-checkbox @change="savePrivacy('wx', privacy.wx)"
-                       v-model="privacy.wx">公开展示我的微信号</el-checkbox>
+                       v-model="privacy.wx">公开展示我的微信号
+          </el-checkbox>
 
           <el-checkbox @change="savePrivacy('qq', privacy.qq)"
-                       v-model="privacy.qq">公开展示我的QQ号</el-checkbox>
+                       v-model="privacy.qq">公开展示我的QQ号
+          </el-checkbox>
 
           <el-checkbox @change="savePrivacy('gender', privacy.gender)"
-                       v-model="privacy.gender">公开展示我的性别</el-checkbox>
+                       v-model="privacy.gender">公开展示我的性别
+          </el-checkbox>
         </div>
       </card>
 
@@ -124,7 +129,9 @@ function savePrivacy(type, status) {
           </el-form-item>
 
           <div style="text-align: center">
-            <el-button :icon="Refresh" @click="resetPassword" plain type="success">立即重置密码</el-button>
+            <el-button @mousedown="e => e.preventDefault()" :icon="Refresh" @click="resetPassword" plain type="success">
+              立即重置密码
+            </el-button>
           </div>
         </el-form>
       </card>

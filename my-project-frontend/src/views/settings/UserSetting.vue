@@ -208,7 +208,9 @@ function uploadSuccess(response) {
           </el-form-item>
 
           <div>
-            <el-button :icon="Refresh" type="success" @click="modifyEmail" plain>更新电子邮件</el-button>
+            <el-button @mousedown="e => e.preventDefault()" :icon="Refresh" type="success" @click="modifyEmail" plain>
+              更新电子邮件
+            </el-button>
           </div>
         </el-form>
       </card>
@@ -228,7 +230,7 @@ function uploadSuccess(response) {
                   :before-upload="beforeAvatarUpload"
                   :on-success="uploadSuccess"
                   :headers="accessHeader()">
-                <el-button size="small" round>
+                <el-button @mousedown="e => e.preventDefault()" size="small" round>
                   修改头像
                 </el-button>
               </el-upload>

@@ -54,7 +54,7 @@
               </el-input>
             </el-col>
             <el-col :span="5">
-              <el-button type="success" @click="validateEmail"
+              <el-button @mousedown="e => e.preventDefault()" type="success" @click="validateEmail"
                          :disabled="!isEmailValid || coldTime > 0">
                 {{ coldTime > 0 ? '请稍后 ' + coldTime + ' 秒' : '获取验证码' }}
               </el-button>
@@ -64,7 +64,9 @@
       </el-form>
     </div>
     <div style="margin-top: 50px">
-      <el-button style="width: 270px" type="warning" @click="register" plain>立即注册</el-button>
+      <el-button style="width: 270px" @mousedown="e => e.preventDefault()" type="warning" @click="register" plain>
+        立即注册
+      </el-button>
     </div>
     <div style="margin-top: 20px">
       <span style="font-size: 14px;line-height: 15px;color: grey">已有账号? </span>

@@ -46,7 +46,9 @@
           </el-form>
         </div>
         <div style="margin-top: 50px">
-          <el-button @click="confirmReset()" style="width: 270px;" type="danger" plain>开始重置密码</el-button>
+          <el-button @mousedown="e => e.preventDefault()" @click="confirmReset()" style="width: 270px;" type="danger"
+                     plain>开始重置密码
+          </el-button>
         </div>
         <div style="margin-top: 20px">
           <el-button @click="router.push('/')" style="width: 270px;" type="warning" plain>返回主页</el-button>
@@ -83,7 +85,9 @@
           </el-form>
         </div>
         <div style="margin-top: 60px">
-          <el-button @click="doReset()" style="width: 270px;" type="danger" plain>立即重置密码</el-button>
+          <el-button @mousedown="e => e.preventDefault()" @click="doReset()" style="width: 270px;" type="danger" plain>
+            立即重置密码
+          </el-button>
         </div>
       </div>
     </transition>
