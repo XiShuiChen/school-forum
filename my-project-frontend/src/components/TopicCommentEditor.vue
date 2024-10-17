@@ -22,6 +22,10 @@ function submitComment() {
     ElMessage.warning('评论字数已超出限制！请删减后再试')
     return
   }
+  if (deltaToText(content.value).length === 0) {
+    ElMessage.warning('请输入评论内容！')
+    return
+  }
   post('api/forum/add-comment', {
     tid: props.tid,
     quote: props.quote ? props.quote.id : -1,
@@ -63,7 +67,7 @@ function deltaToText(delta) {
           <div style="flex: 1; font-size: 13px; color: grey">
             当前字数：{{ deltaToText(content).length }} 字（最大支持2000字）
           </div>
-          <el-button @click="submitComment" type="success">发表评论</el-button>
+          <el-button @mousedown="e => e.preventDefault()" @click="submitComment" type="success">发表评论</el-button>
         </div>
       </div>
     </el-drawer>

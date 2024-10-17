@@ -102,6 +102,10 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
 
     @Override
     public String createComment(int uid, AddCommentVO vo) {
+        JSONObject contentObject = JSONObject.parseObject(vo.getContent());
+        if (contentObject == null || !contentObject.containsKey("ops") || contentObject.getJSONArray("ops").isEmpty()) {
+            return "评论内容不能为空！";
+        }
         if (!textLimitCheck(JSONObject.parseObject(vo.getContent()), 2000))
             return "评论内容过多！发表失败";
         String key = Const.FORUM_TOPIC_COMMENT_COUNTER + uid;
