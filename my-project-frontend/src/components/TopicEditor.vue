@@ -90,12 +90,16 @@ function submitTopic() {
     ElMessage.warning("字数超过限制！")
     return
   }
+  if (!editor.type) {
+    ElMessage.warning("请选择一个合适的帖子类型！")
+    return
+  }
   if (!editor.title) {
     ElMessage.warning("请填写标题！")
     return
   }
-  if (!editor.type) {
-    ElMessage.warning("请选择一个合适的帖子类型！")
+  if (text.length === 0) {
+    ElMessage.warning("请输入帖子内容！")
     return
   }
   props.submit(editor, () => emit('success'))

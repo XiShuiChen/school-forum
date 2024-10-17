@@ -80,7 +80,7 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
     @Override
     public String createTopic(int uid, TopicCreateVO vo) {
         if (!textLimitCheck(vo.getContent(), 20000))
-            return "文章字数过多！发文失败";
+            return "文章字数过多或没有内容！发文失败";
         if (!types.contains(vo.getType()))
             return "文章类型非法！";
         String key = Const.FORUM_TOPIC_CREATE_COUNTER + uid;
@@ -314,7 +314,7 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
         long length = 0;
         for (Object op : object.getJSONArray("ops")) {
             length += JSONObject.from(op).getString("insert").length();
-            if (length > max) return false;
+            if (length > max || length == 0) return false;
         }
         return true;
     }
