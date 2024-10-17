@@ -84,7 +84,7 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
         if (!types.contains(vo.getType()))
             return "文章类型非法！";
         String key = Const.FORUM_TOPIC_CREATE_COUNTER + uid;
-        if (!flowUtils.limitPeriodCounterCheck(key, 3, 3600))
+        if (!flowUtils.limitPeriodCounterCheck(key, 3, 60))
             return "发文频率过高，请稍后再试";
         Topic topic = new Topic();
         BeanUtils.copyProperties(vo, topic);
