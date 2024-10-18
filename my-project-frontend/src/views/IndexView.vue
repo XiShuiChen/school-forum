@@ -120,22 +120,8 @@ const jumpToUrl = (url) => {
           <el-dropdown>
             <el-avatar :src="store.avatarUrl"/>
             <template #dropdown>
-              <el-dropdown-item>
-                <el-icon>
-                  <Operation/>
-                </el-icon>
-                个人设置
-              </el-dropdown-item>
-
-              <el-dropdown-item>
-                <el-icon>
-                  <Message/>
-                </el-icon>
-                消息列表
-              </el-dropdown-item>
-
-              <el-dropdown-item @click="userLogout" divided>
-                <el-icon>
+              <el-dropdown-item @click="userLogout">
+                <el-icon style="height: 30px">
                   <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M23.9917 6H6V42H24" stroke="#26272a" stroke-width="3" stroke-linecap="round"
                           stroke-linejoin="round"/>
@@ -333,5 +319,9 @@ const jumpToUrl = (url) => {
 
 .dark .main-content-page{
   background-color: #212225;
+}
+
+:deep(.el-avatar) {
+  outline: none
 }
 </style>
