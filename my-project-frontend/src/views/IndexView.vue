@@ -16,6 +16,7 @@ import {
   Umbrella, User
 } from "@element-plus/icons-vue";
 import LightCard from "@/components/LightCard.vue";
+import {createRouter, createWebHistory} from "vue-router";
 
 const store = useStore()
 const loading = ref(true)
@@ -50,6 +51,10 @@ function confirmNotification(id, url) {
 function deleteAllNotification() {
   get('/api/notification/delete-all', loadNotification)
 }
+
+const jumpToUrl = (url) => {
+  window.open(url, '_blank');
+};
 </script>
 
 
@@ -69,9 +74,6 @@ function deleteAllNotification() {
             <template #append>
               <el-select style="width: 100px" v-model="searchInput.type">
                 <el-option value="1" label="帖子广场"/>
-                <el-option value="2" label="校园活动"/>
-                <el-option value="3" label="表白墙"/>
-                <el-option value="4" label="教务通知"/>
               </el-select>
             </template>
           </el-input>
@@ -175,43 +177,6 @@ function deleteAllNotification() {
                     帖子广场
                   </template>
                 </el-menu-item>
-
-                <el-menu-item>
-                  <template #title>
-                    <el-icon>
-                      <Money/>
-                    </el-icon>
-                    失物招领
-                  </template>
-                </el-menu-item>
-
-                <el-menu-item>
-                  <template #title>
-                    <el-icon>
-                      <Notification/>
-                    </el-icon>
-                    校园活动
-                  </template>
-                </el-menu-item>
-
-                <el-menu-item>
-                  <template #title>
-                    <el-icon>
-                      <Umbrella/>
-                    </el-icon>
-                    表白墙
-                  </template>
-                </el-menu-item>
-
-                <el-menu-item>
-                  <template #title>
-                    <el-icon>
-                      <School/>
-                    </el-icon>
-                    海文考研
-                    <el-tag style="margin-left: 10px" size="small">合作机构</el-tag>
-                  </template>
-                </el-menu-item>
               </el-sub-menu>
 
               <el-sub-menu index="2">
@@ -219,51 +184,33 @@ function deleteAllNotification() {
                   <el-icon>
                     <Position/>
                   </el-icon>
-                  <span><b>探索与发现</b></span>
+                  <span><b>学校相关</b></span>
                 </template>
 
-                <el-menu-item>
-                  <template #title>
-                    <el-icon>
-                      <Document/>
-                    </el-icon>
-                    成绩查询
-                  </template>
-                </el-menu-item>
-
-                <el-menu-item>
-                  <template #title>
-                    <el-icon>
-                      <Calendar/>
-                    </el-icon>
-                    班级课程表
-                  </template>
-                </el-menu-item>
-
-                <el-menu-item>
+                <el-menu-item @click="jumpToUrl('http://i.zut.edu.cn/new/index.html')">
                   <template #title>
                     <el-icon>
                       <Monitor/>
                     </el-icon>
+                    网络服务大厅
+                  </template>
+                </el-menu-item>
+
+                <el-menu-item @click="jumpToUrl('https://jwc.zut.edu.cn/fwxx/xl.htm')">
+                  <template #title>
+                    <el-icon>
+                      <Calendar/>
+                    </el-icon>
+                    学年校历
+                  </template>
+                </el-menu-item>
+
+                <el-menu-item @click="jumpToUrl('https://jwc.zut.edu.cn/index.htm')">
+                  <template #title>
+                    <el-icon>
+                      <Document/>
+                    </el-icon>
                     教务通知
-                  </template>
-                </el-menu-item>
-
-                <el-menu-item>
-                  <template #title>
-                    <el-icon>
-                      <Collection/>
-                    </el-icon>
-                    在线图书馆
-                  </template>
-                </el-menu-item>
-
-                <el-menu-item>
-                  <template #title>
-                    <el-icon>
-                      <DataLine/>
-                    </el-icon>
-                    预约教室
                   </template>
                 </el-menu-item>
               </el-sub-menu>
