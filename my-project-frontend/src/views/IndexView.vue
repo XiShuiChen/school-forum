@@ -292,22 +292,22 @@ const jumpToUrl = (url) => {
     .el-avatar:hover {
       cursor: pointer;
     }
-  }
 
-  .profile {
-    text-align: right;
-    margin-right: 20px;
+    .profile {
+      text-align: right;
+      margin-right: 20px;
 
-    :first-child {
-      font-size: 20px;
-      font-weight: bold;
-      line-height: 20px;
-    }
+      :first-child {
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 20px;
+      }
 
-    :last-child {
-      font-size: 12px;
-      color: gray;
-      margin-top: 4px;
+      :last-child {
+        font-size: 12px;
+        color: gray;
+        margin-top: 4px;
+      }
     }
   }
 }
