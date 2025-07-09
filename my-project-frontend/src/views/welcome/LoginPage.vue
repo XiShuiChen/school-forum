@@ -53,8 +53,9 @@
 <script setup>
 import {User, Lock} from '@element-plus/icons-vue'
 import router from "@/router";
-import {reactive, ref} from "vue";
+import {inject, reactive, ref} from "vue";
 import {login} from '@/net'
+import {getUserInfo} from "@/net/api/user";
 
 const formRef = ref()
 const form = reactive({
@@ -72,10 +73,15 @@ const rules = {
   ]
 }
 
+const loading = inject('userLoading')
+
 function userLogin() {
   formRef.value.validate((isValid) => {
     if (isValid) {
-      login(form.username, form.password, form.remember, () => router.push("/index"))
+      login(form.username, form.password, form.remember, () => {
+        getUserInfo(loading)
+        router.push("/index")
+      })
     }
   });
 }

@@ -1,26 +1,19 @@
 <script setup>
-import {get, logout} from '@/net'
-import router from "@/router";
-import {useStore} from "@/store";
-import {reactive, ref} from "vue";
+import {get} from '@/net'
+import {inject, reactive, ref} from "vue";
 import {
   Bell,
   Calendar,
-  ChatDotSquare, Check, Collection, DataLine,
-  Document,
-  Location, Lock, Message,
-  Money, Monitor,
-  Notification, Operation,
+  ChatDotSquare, Check, Document,
+  Location, Lock, Monitor,
   Position,
-  School, Search, Setting,
-  Umbrella, User
+  Search, Setting,
+  User
 } from "@element-plus/icons-vue";
 import LightCard from "@/components/LightCard.vue";
-import {createRouter, createWebHistory} from "vue-router";
 import UserInfo from "@/components/UserInfo.vue";
 
-const store = useStore()
-const loading = ref(true)
+const loading = inject('userLoading')
 
 const searchInput = reactive({
   type: '1',
@@ -28,11 +21,6 @@ const searchInput = reactive({
 })
 
 const notification = ref([])
-
-get('/api/user/info', (data) => {
-  store.user = data;
-  loading.value = false
-})
 
 const loadNotification =
     () => get('/api/notification/list', data => notification.value = data)
