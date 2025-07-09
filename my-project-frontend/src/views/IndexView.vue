@@ -59,7 +59,9 @@ const jumpToUrl = (url) => {
   <div class="main-content" v-loading="loading" element-loading-text="正在加载，请稍后...">
     <el-container style="height: 100%" v-if="!loading">
       <el-header class="main-content-header">
-        <el-image class="logo" src="https://element-plus.org/images/element-plus-logo.svg"/>
+        <div style="width: 320px; height: 32px">
+          <el-image class="logo" src="https://element-plus.org/images/element-plus-logo.svg"/>
+        </div>
         <div style="flex: 1; padding:0 20px; text-align: center">
           <el-input v-model="searchInput.text" style="width: 100%; max-width: 500px" placeholder="搜索论坛相关内容...">
             <template #prefix>
@@ -79,7 +81,7 @@ const jumpToUrl = (url) => {
         <user-info>
           <el-popover placement="bottom" :width="350" trigger="click">
             <template #reference>
-              <el-badge style="margin:6px 15px 0 0;" is-dot :hidden="!notification.length">
+              <el-badge is-dot :hidden="!notification.length">
                 <div class="notification">
                   <el-icon><Bell/></el-icon>
                   <div style="font-size: 10px">消息</div>
