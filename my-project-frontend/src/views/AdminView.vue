@@ -11,6 +11,10 @@ import {
   Setting,
   User
 } from "@element-plus/icons-vue";
+import UserInfo from "@/components/UserInfo.vue";
+import {get} from "@/net";
+import {useStore} from "@/store";
+import {ref} from "vue";
 
 const adminMenu = [
   {
@@ -25,10 +29,18 @@ const adminMenu = [
     ]
   }
 ]
+
+const loading = ref(true)
+const store = useStore()
+
+get('/api/user/info', (data) => {
+  store.user = data;
+  loading.value = false
+})
 </script>
 
 <template>
-  <div class="admin-content">
+  <div class="admin-content" v-loading="loading" element-loading-text="正在加载，请稍后...">
     <el-container style="height: 100%">
       <el-aside width="230px" class="admin-content-aside">
         <div class="logo-box">
@@ -65,7 +77,11 @@ const adminMenu = [
 
 
       <el-container>
-        <el-header>Header</el-header>
+        <el-header class="admin-content-header">
+          <div style="flex: 1"></div>
+          <user-info/>
+        </el-header>
+
         <el-main>Main</el-main>
       </el-container>
     </el-container>
@@ -89,6 +105,14 @@ const adminMenu = [
         height: 32px;
     }
     }
+  }
+
+  .admin-content-header {
+    border-bottom: solid 1px var(--el-border-color);
+    height: 55px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
   }
 }
 </style>

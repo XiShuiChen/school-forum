@@ -17,6 +17,7 @@ import {
 } from "@element-plus/icons-vue";
 import LightCard from "@/components/LightCard.vue";
 import {createRouter, createWebHistory} from "vue-router";
+import UserInfo from "@/components/UserInfo.vue";
 
 const store = useStore()
 const loading = ref(true)
@@ -36,10 +37,6 @@ get('/api/user/info', (data) => {
 const loadNotification =
     () => get('/api/notification/list', data => notification.value = data)
 loadNotification()
-
-function userLogout() {
-  logout(() => router.push("/"))
-}
 
 function confirmNotification(id, url) {
   get(`api/notification/delete?id=${id}`, () => {
@@ -79,8 +76,7 @@ const jumpToUrl = (url) => {
           </el-input>
         </div>
 
-
-        <div class="user-info">
+        <user-info>
           <el-popover placement="bottom" :width="350" trigger="click">
             <template #reference>
               <el-badge style="margin:6px 15px 0 0;" is-dot :hidden="!notification.length">
@@ -111,31 +107,7 @@ const jumpToUrl = (url) => {
                          @click="deleteAllNotification" style="width: 100%" plain>清除全部未读消息</el-button>
             </div>
           </el-popover>
-
-          <div class="profile">
-            <div>{{ store.user.username }}</div>
-            <div>{{ store.user.email }}</div>
-          </div>
-
-          <el-dropdown>
-            <el-avatar :src="store.avatarUrl"/>
-            <template #dropdown>
-              <el-dropdown-item @click="userLogout">
-                <el-icon style="height: 30px">
-                  <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M23.9917 6H6V42H24" stroke="#26272a" stroke-width="3" stroke-linecap="round"
-                          stroke-linejoin="round"/>
-                    <path d="M33 33L42 24L33 15" stroke="#26272a" stroke-width="3" stroke-linecap="round"
-                          stroke-linejoin="round"/>
-                    <path d="M16 23.9917H42" stroke="#26272a" stroke-width="3" stroke-linecap="round"
-                          stroke-linejoin="round"/>
-                  </svg>
-                </el-icon>
-                退出登录
-              </el-dropdown-item>
-            </template>
-          </el-dropdown>
-        </div>
+        </user-info>
 
       </el-header>
       <el-container>
